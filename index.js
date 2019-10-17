@@ -4,6 +4,13 @@ const board = new Board()
 
 const config = require("./config")
 
+const colors = {
+  reset: "\x1b[0m",
+  success: "\x1b[32m",
+  testing: "\x1b[33m",
+  error: "\x1b[31m",
+}
+
 // Get last build status from Codeship.
 async function getStatus() {
   let status
@@ -23,9 +30,10 @@ async function getStatus() {
   // If project found, set build status.
   if (lastBuild.length) {
     status = lastBuild[0].builds[0].status
-    console.info("Build", status)
+    console.info(colors.reset, "Build", colors[status], status)
   } else {
-    console.error("Project not found.")
+    console.error(colors.error, "Project not found")
+    process.exit()
   }
 
   return await status
@@ -56,6 +64,7 @@ function resetBoard() {}
 
 // Main loop.
 board.on("ready", () => {
+  console.error(colors.reset, "Start...")
   run()
   setInterval(() => {
     run()
@@ -65,5 +74,5 @@ board.on("ready", () => {
 // Exit.
 board.on("exit", function() {
   updateBoard()
-  console.log("Exit board")
+  console.log(colors.reset, "Exit board")
 })

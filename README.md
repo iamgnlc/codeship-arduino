@@ -1,7 +1,7 @@
 # codeship-arduino
 
 Will poll last build status from Codeship and fire the relative LED on arduino
-board.
+board. Uses Codeship API v2.
 
 Rename `config.example.js` to `config.js` and add your codeship details to it.
 
