@@ -3,6 +3,7 @@ const { Board, Led } = require("johnny-five")
 const board = new Board()
 
 const config = require("./config")
+const logo = require("./logo")
 
 const colors = {
   reset: "\x1b[0m",
@@ -11,9 +12,14 @@ const colors = {
   error: "\x1b[31m",
 }
 
+var status, prevStatus
+
+function output(text, color = colors.reset) {
+  console.log(color, text, colors.reset)
+}
+
 // Get last build status from Codeship.
 async function getStatus() {
-  let status
   const codeship = new Codeship({
     username: config.userName,
     password: config.password,
@@ -30,11 +36,15 @@ async function getStatus() {
   // If project found, set build status.
   if (lastBuild.length) {
     status = lastBuild[0].builds[0].status
-    console.info(colors.reset, "Build", colors[status], status)
+    // Output only if status is changed.
+    if (prevStatus !== status) output(`Build ${status}`, colors[status])
   } else {
-    console.error(colors.error, "Project not found")
+    output("Project not found", colors.error)
     process.exit()
   }
+
+  // Save previous state.
+  prevStatus = status
 
   return await status
 }
@@ -60,11 +70,11 @@ async function run() {
   updateBoard(status)
 }
 
-function resetBoard() {}
-
 // Main loop.
 board.on("ready", () => {
-  console.error(colors.reset, "Start...")
+  console.clear()
+  output(logo)
+  output("Start...")
   run()
   setInterval(() => {
     run()
@@ -74,5 +84,5 @@ board.on("ready", () => {
 // Exit.
 board.on("exit", function() {
   updateBoard()
-  console.log(colors.reset, "Exit board")
+  output("Exit board")
 })
