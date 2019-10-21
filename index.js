@@ -29,7 +29,7 @@ async function getProject() {
 
   let project = codeship.organizations[config.organization].projects.filter(
     (project) => {
-      return project.uuid === config.projectUuid
+      return project.name === config.project
     },
   )
 
@@ -102,7 +102,7 @@ board.on("ready", () => {
 
   console.clear()
   output(logo)
-  output("Start...")
+  output(config.project)
   run()
   setInterval(() => {
     run()
