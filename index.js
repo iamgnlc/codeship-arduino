@@ -33,7 +33,7 @@ async function getProject() {
     },
   )
 
-  return await project
+  return project.length ? project[0] : null
 }
 
 // Get last build status from Codeship.
@@ -41,8 +41,8 @@ async function getStatus() {
   let project = await getProject()
 
   // If project found, set build status.
-  if (project.length) {
-    status = project[0].builds[0].status
+  if (project) {
+    status = project.builds[0].status
     // Output only if status is changed.
     if (prevStatus !== status) output(`Build ${status}`, colors[status])
   } else {
@@ -62,8 +62,8 @@ async function triggerBuild() {
 
   const build = {
     organization: codeship.organizations[config.organization].uuid,
-    project: config.projectUuid,
-    build: project[0].builds[0].uuid,
+    project: project.uuid,
+    build: project.builds[0].uuid,
   }
 
   output("Build triggered", colors.build)
